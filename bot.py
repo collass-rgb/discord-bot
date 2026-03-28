@@ -106,7 +106,7 @@ async def on_message(message):
         await message.reply('\n\n'.join(lines))
         return
 
-    # 制式模式：查商品資訊
+# 制式模式：查商品資訊
     sku = re.sub(r'^查\s*', '', question).strip().upper()
     async with message.channel.typing():
         data = call_gas('search_product', sku)
@@ -114,9 +114,10 @@ async def on_message(message):
     if not results:
         await message.reply(f'找不到「{sku}」的商品資料。')
         return
-    lines = []
+
+    # 每筆結果分開發送，避免超過 2000 字元限制
     for r in results:
-        lines.append(format_product(r))
-    await message.reply('\n\n'.join(lines))
+        text = format_product(r)
+        await message.channel.send(text)
 
 client.run(DISCORD_TOKEN)
