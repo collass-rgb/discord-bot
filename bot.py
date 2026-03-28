@@ -39,6 +39,7 @@ def format_product(r):
         last_qty_str = '無記錄'
     return (
         f"📦 **{r.get('貨號', '')}**｜{r.get('商品名稱', '')}\n"
+        f"🗂️ 分類：{r.get('分類', '')}\n"
         f"💰 最新台幣成本：{r.get('最新台幣', '')}\n"
         f"📊 毛利率：{r.get('毛利率', '')}\n"
         f"🏷️ 定價：{r.get('定價', '')}\n"
