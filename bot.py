@@ -88,6 +88,9 @@ async def on_message(message):
         async with message.channel.typing():
             data = call_gas(action, sku)
             answer = ask_claude(q, data)
+        # AI 回覆也截斷保護
+        if len(answer) > 1900:
+            answer = answer[:1900] + '\n...（內容過長已截斷）'
         await message.reply(answer)
         return
 
@@ -100,13 +103,12 @@ async def on_message(message):
         if not results:
             await message.reply(f'找不到「{sku}」的進貨記錄。')
             return
-        lines = [f"**{sku} 最近進貨記錄**"]
+        await message.reply(f'**{sku} 最近進貨記錄**')
         for r in results:
-            lines.append(format_purchase(r))
-        await message.reply('\n\n'.join(lines))
+            await message.channel.send(format_purchase(r))
         return
 
-# 制式模式：查商品資訊
+    # 制式模式：查商品資訊
     sku = re.sub(r'^查\s*', '', question).strip().upper()
     async with message.channel.typing():
         data = call_gas('search_product', sku)
@@ -114,10 +116,8 @@ async def on_message(message):
     if not results:
         await message.reply(f'找不到「{sku}」的商品資料。')
         return
-
-    # 每筆結果分開發送，避免超過 2000 字元限制
+    # 每筆分開發送，避免超過 2000 字元
     for r in results:
-        text = format_product(r)
-        await message.channel.send(text)
+        await message.channel.send(format_product(r))
 
 client.run(DISCORD_TOKEN)
